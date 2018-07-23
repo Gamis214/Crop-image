@@ -80,23 +80,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getCameraImage() {
+        imageUri = createNewUri(this,mCompressFormat);
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "IMG_FOLDER");
-        try {
-            if (!mediaStorageDir.exists()) {
-                if (!mediaStorageDir.mkdirs()) {
-                    Toast.makeText(this, "Empty", Toast.LENGTH_SHORT).show();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        imageUri = Uri.fromFile(new File(mediaStorageDir.getPath() + File.separator +
-                "profile_img.jpg"));
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-
+        intent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
         startActivityForResult(intent, 1002);
     }
 
@@ -138,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
     private void cutImage() {
         container.setVisibility(View.GONE);
         container_crop.setVisibility(View.VISIBLE);
+        cropImageView.setCropMode(CropImageView.CropMode.CIRCLE_SQUARE);
         cropImageView.load(imageUri).execute(new LoadCallback() {
             @Override
             public void onSuccess() {
@@ -162,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1002 && resultCode == RESULT_OK) {
-            //imageUri = data.getData();
             final InputStream imageStream;
             try {
                 imageStream = getContentResolver().openInputStream(imageUri);
